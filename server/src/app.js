@@ -1,13 +1,18 @@
 let express = require('express')
 let bodyParser = require('body-parser')
+const {sequelize} = require('./models')
+
+const config = require('./config/config')
 
 const app = express()
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
+require('./route')(app)
+
 app.get('/status', function(req,res){
-    res.send('Hello nodejs server belong to guynajaa')
+    res.send('Hello nodejs server belong to chanattawan')
 })
 
 app.get('/hello/:name', function (req,res) {
@@ -15,27 +20,10 @@ app.get('/hello/:name', function (req,res) {
     res.send('say hello with ' + req.params.name)
 })
 
-app.get('/user/:userId', function(req, res) {
-    res.send('ดูข้อมูลผู้ใช้งาน' + req.params.userId)
-})
+let port = process.env.PORT || config.port
 
-app.get('/users', function(req, res) {
-    res.send('ดูข้อมูลผู้ใช้งานทั้งหมด')
-})
-
-app.post('/user/', function(req, res) {
-    res.send('สร้างผู้ใช้งาน : ' + JSON.stringify(req.body))
-})
-
-app.put('/user/:userId', function(req, res) {
-    res.send('แก้ไขผู้ใช้งาน : ' + req.params.userId + ' : ' + JSON.stringify(req.body.name))
-})
-
-app.delete('/user/:userId', function(req, res) {
-    res.send('ลบผู้ใช้งาน : ' + req.params.userId + ' : ' + JSON.stringify(req.body.name))
-})
-
-let port = 8081
-app.listen(port, function() {
-    console.log('server running on '+ port)
+sequelize.sync({force: false}).then(() => {
+    app.listen(port, function () {
+        console.log('Server running on ' + port)
+    })
 })
